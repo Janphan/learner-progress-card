@@ -2,14 +2,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
-    "outDir": "./dist", 
+    "outDir": "./dist",
     "rootDir": "./server",
     "removeComments": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
-  }
-  ,
-  "include": ["server/**/*"]
+    "esModuleInterop": true
+  },
+  "include": ["server/**/*"],
+  "extends": "./tsconfig.base.json"
 }
