@@ -1,6 +1,7 @@
 export interface Learner {
   id: number
   name: string
+  program: string | null
 }
 
 export interface LearnerProgress extends Learner {
@@ -24,7 +25,9 @@ function isCount(value: unknown): value is number {
 
 function isLearner(value: unknown): value is Learner {
   return isRecord(value) && isCount(value.id) && value.id > 0 &&
-    typeof value.name === 'string' && value.name.trim().length > 0
+    typeof value.name === 'string' && value.name.trim().length > 0 &&
+    (value.program === null ||
+      (typeof value.program === 'string' && value.program.trim().length > 0))
 }
 
 function isProgress(value: unknown): value is LearnerProgress {

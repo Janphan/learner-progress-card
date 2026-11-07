@@ -3,14 +3,14 @@
 - **Status:** Accepted (API connected; preview removed)
 - **Date:** 2026-11-07
 - **Supersedes:** none
-- **Related:** `design_tokens_section.md`, `docs/decisions/ADR-0001-data-model.md`,
+- **Related:** `docs/decisions/ADR-0001-data-model.md`,
   `docs/decisions/ADR-0002-no-auth-v1.md`, `client/src/index.css`, `client/src/learnerApi.ts`
 
 ## Context
 
 The dashboard shell is built with React, Vite, and TypeScript, and the visual design is defined
-by the colour tokens in `design_tokens_section.md`. We needed to decide how to wire Tailwind and
-the tokens, how light and dark themes are selected, and how to build and review the UI before the
+by the colour tokens in `client/src/index.css`. We needed to decide how to wire Tailwind and the
+tokens, how light and dark themes are selected, and how to build and review the UI before the
 learner API existed. Preview data was the temporary scaffold for that phase.
 
 The learner API now exists, and the dashboard loads the learner list and selected learner's
@@ -33,11 +33,16 @@ Tailwind's preflight is intentionally omitted so base styles stay explicit and s
 
 ### 2. Design tokens back the utilities
 
-`design_tokens_section.md` remains the source of truth for colours. `@theme inline` maps the
-tokens to `--color-dashboard-*` utilities (`bg-dashboard-bg`, `text-dashboard-muted`,
-`bg-dashboard-accent`, and so on). Those utilities resolve to `--color-*` custom properties scoped
-to `.app`. Components use Tailwind utilities and never raw hex values, so changing a token
-changes every surface.
+`client/src/index.css` is the source of truth for colours. Its `.app` and
+`.app[data-theme='dark']` rules define the light and dark values, while `@theme inline` maps them
+to `--color-dashboard-*` utilities (`bg-dashboard-bg`, `text-dashboard-muted`,
+`bg-dashboard-accent`, and so on). Components use these Tailwind utilities rather than hard-coded
+colours so token changes stay consistent across the dashboard.
+
+Borders and the progress track use separate tokens. `--color-border` (mapped to
+`border-dashboard-border`) is tuned for outline contrast on cards, inputs, and dividers, while
+`--color-track` (`bg-dashboard-track`) stays subtle behind the progress fill. Sharing one token
+made the outlines too faint, especially in the light theme.
 
 ### 3. Light and dark themes
 
@@ -106,6 +111,8 @@ Routing can be added when the module detail view exists.
 - [x] Replace `previewData` with the learner API and remove the preview label. **Done:**
       `client/src/learnerApi.ts` (`a2d5b2b`).
 - [x] Add loading, empty, and retryable error states for the learner list and progress.
+- [x] Give borders their own token so outlines are more visible without strengthening the
+      progress track. **Done:** `client/src/index.css` (`fb5f3bd`).
 - [ ] Add the module list.
 - [ ] Render the API's weekly completion data as a chart.
 - [ ] Add Playwright e2e coverage for the dashboard and both themes.

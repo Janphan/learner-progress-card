@@ -3,17 +3,40 @@ import type Database from 'better-sqlite3'
 const createdAt = '2026-01-01T00:00:00.000Z'
 const updatedAt = createdAt
 
-const programSeed = {
-  title: 'Demo: Learning Foundations',
-  description: 'A sample program for previewing learner progress.',
-  status: 'published',
-} as const
-
-const moduleSeeds = [
-  { title: 'Getting Started', lessons: ['Welcome', 'Learning Goals', 'Study Plan'] },
-  { title: 'Core Skills', lessons: ['First Principles', 'Practice', 'Knowledge Check'] },
-  { title: 'Next Steps', lessons: ['Apply Your Skills', 'Review', 'Final Assessment'] },
+const programSeeds = [
+  {
+    title: 'Demo: Learning Foundations',
+    description: 'A sample program for building core learning habits.',
+    status: 'published',
+    modules: [
+      { title: 'Getting Started', lessons: ['Welcome', 'Learning Goals', 'Study Plan'] },
+      { title: 'Core Skills', lessons: ['First Principles', 'Practice', 'Knowledge Check'] },
+      { title: 'Next Steps', lessons: ['Apply Your Skills', 'Review', 'Final Assessment'] },
+    ],
+  },
+  {
+    title: 'Demo: Data Literacy',
+    description: 'A sample program for understanding and communicating with data.',
+    status: 'published',
+    modules: [
+      { title: 'Data Essentials', lessons: ['Data Types', 'Data Quality', 'Data Ethics'] },
+      { title: 'Exploration', lessons: ['Reading Tables', 'Visualizing Trends', 'Asking Questions'] },
+      { title: 'Insights', lessons: ['Communicating Findings', 'Making Decisions', 'Next Steps'] },
+    ],
+  },
+  {
+    title: 'Demo: Product Design',
+    description: 'A sample program for researching, prototyping, and delivering designs.',
+    status: 'published',
+    modules: [
+      { title: 'Design Basics', lessons: ['User Needs', 'Research Methods', 'Accessibility'] },
+      { title: 'Prototyping', lessons: ['Flows and Wireframes', 'Testing Ideas', 'Iteration'] },
+      { title: 'Delivery', lessons: ['Design Systems', 'Developer Handoff', 'Measuring Impact'] },
+    ],
+  },
 ] as const
+
+type ProgramSeed = (typeof programSeeds)[number]
 
 const lessonContentTypes = ['article', 'video', 'quiz'] as const
 
@@ -27,6 +50,7 @@ const learnerSeeds = [
     completedLessons: 0,
     inProgressLesson: null,
     enrolledAt: '2026-01-02T00:00:00.000Z',
+    programTitle: 'Demo: Learning Foundations',
   },
   {
     name: 'Jordan Lee',
@@ -37,6 +61,7 @@ const learnerSeeds = [
     completedLessons: 2,
     inProgressLesson: { position: 3, percent: 40 },
     enrolledAt: '2026-01-04T00:00:00.000Z',
+    programTitle: 'Demo: Learning Foundations',
   },
   {
     name: 'Casey Patel',
@@ -47,6 +72,7 @@ const learnerSeeds = [
     completedLessons: 5,
     inProgressLesson: { position: 6, percent: 60 },
     enrolledAt: '2026-01-09T00:00:00.000Z',
+    programTitle: 'Demo: Data Literacy',
   },
   {
     name: 'Riley Chen',
@@ -57,6 +83,7 @@ const learnerSeeds = [
     completedLessons: 8,
     inProgressLesson: { position: 9, percent: 80 },
     enrolledAt: '2026-01-14T00:00:00.000Z',
+    programTitle: 'Demo: Product Design',
   },
   {
     name: 'Taylor Brooks',
@@ -67,12 +94,13 @@ const learnerSeeds = [
     completedLessons: 9,
     inProgressLesson: null,
     enrolledAt: '2026-01-19T00:00:00.000Z',
+    programTitle: 'Demo: Data Literacy',
   },
 ] as const
 
 type LearnerSeed = (typeof learnerSeeds)[number]
 
-function seedProgram(sqlite: Database.Database): number {
+function seedProgram(sqlite: Database.Database, programSeed: ProgramSeed): number {
   const existing = sqlite
     .prepare('SELECT id FROM programs WHERE title = ? LIMIT 1')
     .get(programSeed.title) as { id: number } | undefined
@@ -95,7 +123,11 @@ function seedProgram(sqlite: Database.Database): number {
   return Number(result.lastInsertRowid)
 }
 
-function seedCurriculum(sqlite: Database.Database, programId: number): number[] {
+function seedCurriculum(
+  sqlite: Database.Database,
+  programId: number,
+  moduleSeeds: ProgramSeed['modules'],
+): number[] {
   const moduleStatement = sqlite.prepare(`
     INSERT INTO modules (program_id, title, description, position, created_at, updated_at)
     VALUES (?, ?, NULL, ?, ?, ?)
@@ -150,6 +182,7 @@ function seedLearner(
   learner: LearnerSeed,
   programId: number,
   lessonIds: number[],
+  seededProgramIds: number[],
 ): void {
   sqlite
     .prepare(`
@@ -162,6 +195,25 @@ function seedLearner(
   const user = sqlite
     .prepare('SELECT id FROM users WHERE email = ?')
     .get(learner.email) as { id: number }
+
+  for (const seededProgramId of seededProgramIds) {
+    if (seededProgramId === programId) continue
+
+    const obsoleteEnrollments = sqlite
+      .prepare<[number, number], { id: number }>(
+        'SELECT id FROM enrollments WHERE user_id = ? AND program_id = ?',
+      )
+      .all(user.id, seededProgramId)
+
+    for (const enrollment of obsoleteEnrollments) {
+      sqlite
+        .prepare('DELETE FROM lesson_progress WHERE enrollment_id = ?')
+        .run(enrollment.id)
+      sqlite
+        .prepare('DELETE FROM enrollments WHERE id = ?')
+        .run(enrollment.id)
+    }
+  }
 
   sqlite
     .prepare(`
@@ -237,11 +289,29 @@ function seedLearner(
 
 export function seedDatabase(sqlite: Database.Database): void {
   sqlite.transaction(() => {
-    const programId = seedProgram(sqlite)
-    const lessonIds = seedCurriculum(sqlite, programId)
+    const seededPrograms = programSeeds.map((programSeed) => {
+      const id = seedProgram(sqlite, programSeed)
+      return {
+        id,
+        title: programSeed.title,
+        lessonIds: seedCurriculum(sqlite, id, programSeed.modules),
+      }
+    })
+    const seededProgramIds = seededPrograms.map(({ id }) => id)
 
     for (const learner of learnerSeeds) {
-      seedLearner(sqlite, learner, programId, lessonIds)
+      const program = seededPrograms.find(
+        (seededProgram) => seededProgram.title === learner.programTitle,
+      )
+      if (!program) throw new Error(`Missing demo program: ${learner.programTitle}`)
+
+      seedLearner(
+        sqlite,
+        learner,
+        program.id,
+        program.lessonIds,
+        seededProgramIds,
+      )
     }
   })()
 }

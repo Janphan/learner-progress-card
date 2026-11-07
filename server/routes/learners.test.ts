@@ -53,7 +53,9 @@ afterEach(async () => {
 describe('learner routes', () => {
   it('lists learners and returns the progress response', async () => {
     const listResponse = await fetch(baseUrl)
-    expect(await listResponse.json()).toEqual([{ id: 1, name: 'Alex' }])
+    expect(await listResponse.json()).toEqual([
+      { id: 1, name: 'Alex', program: 'Program' },
+    ])
 
     const response = await fetch(`${baseUrl}/1/progress`)
     expect(response.status).toBe(200)
@@ -69,6 +71,23 @@ describe('learner routes', () => {
       lastActivityAt: '2026-01-08T10:00:00.000Z',
       weeklyProgress: [{ week: '2026-01-05', count: 1 }],
     })
+  })
+
+  it('uses the first enrollment program and includes learners without enrollment', async () => {
+    sqlite.exec(`
+      INSERT INTO programs (id, title, status, created_at, updated_at)
+        VALUES (2, 'Second Program', 'published', '2026-01-01', '2026-01-01');
+      INSERT INTO enrollments (id, user_id, program_id, enrolled_at, status)
+        VALUES (2, 1, 2, '2026-01-02', 'enrolled');
+      INSERT INTO users (id, name, email, created_at, updated_at)
+        VALUES (2, 'Riley', 'riley@example.test', '2026-01-01', '2026-01-01');
+    `)
+
+    const response = await fetch(baseUrl)
+    expect(await response.json()).toEqual([
+      { id: 1, name: 'Alex', program: 'Program' },
+      { id: 2, name: 'Riley', program: null },
+    ])
   })
 
   it('handles invalid and missing learner IDs', async () => {
