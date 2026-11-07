@@ -60,7 +60,8 @@ v1 has no authentication, registration, password reset, sessions, or tokens.
 
 ## Follow-ups
 
-- [ ] Remove "Sign in / Resume Session" from the v1 user flow or label it post-MVP.
+- [x] Remove "Sign in / Resume Session" from the v1 user flow or label it post-MVP.
+      **Done:** `README.md` now documents a read-only v1 flow and a separate post-MVP flow.
 - [ ] When auth is added, introduce session middleware and replace `/api/demo/learner` with
       the current-user endpoint; keep the response shape stable.
 - [ ] Revisit theme syncing at the same time, since it depends on a stable identity.

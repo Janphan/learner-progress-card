@@ -25,8 +25,9 @@
 | Testing | Vitest + Playwright | Unit/DB/API tests and end-to-end user flows |
 | Runtime | Node.js | Server process and tooling |
 
-> The client and server scaffolds are in place. Tailwind, the database layer, shared
-> contracts, and the test tooling are still being wired up.
+> The `client`, `server`, and `shared` workspaces are scaffolded, and `typecheck`, `lint`,
+> `test`, and `build` pass. Tailwind, the database layer, shared contracts, and Playwright e2e
+> are still being wired up.
 
 ## Functions:
 
@@ -35,39 +36,52 @@
 3. Show modules completed out of total
 4. Light and Dark theme
 
-## User flow
+## User flow (v1)
+
+```text
 Open Learning Platform
         ↓
-Open demo learner (no sign-in in v1)
+Open demo learner (no sign-in)
         ↓
 Open Learning Progress Dashboard
         ↓
-View Learner Name + Enrolled Program
+View learner name + enrolled program
         ↓
-View Overall Progress Percentage
+View overall progress and modules completed / total
         ↓
-View Completed Modules / Total Modules
+Select a module
         ↓
-Select a Module
+View module details and lesson statuses (read-only)
+        ↓
+Return to progress dashboard
+```
+
+## Post-MVP flow
+
+Marking lessons complete and recalculating progress is deferred until after v1.
+
+```text
+Select a module
         ↓
 ┌───────────────────────┐
 │ Is module completed?  │
 └───────────────────────┘
-      ↓ Yes       ↓ No
-Review module     Continue learning
+      ↓ Yes        ↓ No
+Review module    Continue learning
       ↓                ↓
-View results      Complete lessons
+View results     Complete lessons
       └───────┬────────┘
               ↓
       Progress updates
               ↓
- Return to Progress Dashboard
+ Return to progress dashboard
+```
 
 ## v1 scope
 
 v1 is a read-only demo: one seeded learner and program, with no sign-in, registration, or
-password reset. The "Continue learning" / "Complete lessons" branch above is the target flow,
-not v1. See `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
+password reset. Progress is seeded, so the "Complete lessons" loop in the post-MVP flow is not
+part of v1. See `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
 
 ## Development
 
@@ -89,9 +103,20 @@ npm run dev:server
 In a second terminal, start the Vite client:
 
 ```bash
-npm run dev -w learning-progress
+npm run dev
 ```
 
 Open the URL printed by Vite. Its development proxy forwards `/api` requests
 to the server on port 3000. The health endpoint is available at
 `http://localhost:3000/api/health`.
+
+Run the workspace checks from the repository root:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+Database and end-to-end commands will be added once those layers are scaffolded.
