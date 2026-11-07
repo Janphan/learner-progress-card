@@ -3,7 +3,8 @@
 - **Status:** Accepted
 - **Date:** 2026-11-07
 - **Supersedes:** none
-- **Related:** `database/README.md`, `docs/decisions/ADR-0002-no-auth-v1.md`
+- **Related:** `database/README.md`, `docs/decisions/ADR-0002-no-auth-v1.md`,
+  `docs/decisions/ADR-0004-frontend-styling-and-preview.md`
 
 ## Context
 
@@ -76,6 +77,11 @@ Theme is a per-device preference, not learner data. v1 stores it in `localStorag
 **not** include `users.theme_preference`. This avoids a column that the server never reads and
 that cannot be meaningfully scoped without accounts.
 
+The client implements this by reading `learner-progress-theme`, falling back to
+`prefers-color-scheme`, and writing the toggle result back to `localStorage`. The selected theme
+is applied with a `data-theme` attribute on the app root so the CSS tokens can switch. See
+ADR-0004 for the styling and token wiring.
+
 If theme later needs to follow a learner across devices, reintroduce it with authentication,
 not before.
 
@@ -87,12 +93,20 @@ Use `better-sqlite3` with `drizzle-orm/better-sqlite3` for v1.
 - Runs migrations and constraint tests in-process.
 - Makes `PRAGMA foreign_keys = ON` explicit on every connection.
 
+The `database/` workspace uses Drizzle for the schema and migrations. The current server API
+opens `better-sqlite3` directly in `server/index.ts` and queries it from
+`server/learners/repository.ts`; moving those queries to `drizzle-orm/better-sqlite3` remains a
+follow-up.
+
 Revisit `libsql` only if the project moves to a remote or edge database.
 
 ### 8. Where integrity lives
 
 Enforce integrity in the database (foreign keys, unique indexes, check constraints) **and**
 validate at the API boundary with Zod. Application code may not be the only guard.
+
+The learner routes currently validate the `id` parameter manually; shared Zod schemas are still
+planned (ADR-0003).
 
 Note that SQLite enforces foreign keys per connection: every connection, including tests and
 CLI scripts, must run `PRAGMA foreign_keys = ON`.
@@ -128,7 +142,12 @@ CLI scripts, must run `PRAGMA foreign_keys = ON`.
 
 ## Follow-ups
 
-- [ ] Reflect these conventions in the Drizzle schema (`database/schema.ts`).
-- [ ] Add constraint tests that assert composite FKs, checks, and unique indexes fire with
+- [x] Reflect these conventions in the Drizzle schema (`database/schema.ts`).
+- [x] Add constraint tests that assert composite FKs, checks, and unique indexes fire with
       `PRAGMA foreign_keys = ON`.
-- [ ] Keep `database/README.md` aligned when the schema changes.
+- [x] Keep `database/README.md` aligned when the schema changes.
+- [x] Use `better-sqlite3` with `PRAGMA foreign_keys = ON` in the running server.
+- [ ] Move the server's learner queries to `drizzle-orm/better-sqlite3`.
+- [ ] Add shared Zod schemas and validate requests/responses at the API boundary.
+- [ ] Revisit `theme_preference` only when authentication exists and cross-device theming is
+      required.

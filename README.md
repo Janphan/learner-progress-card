@@ -25,29 +25,32 @@
 | Testing | Vitest + Playwright | Unit/DB/API tests and end-to-end user flows |
 | Runtime | Node.js | Server process and tooling |
 
-> The `client`, `server`, and `shared` workspaces are scaffolded, and `typecheck`, `lint`,
-> `test`, and `build` pass. Tailwind, the database layer, shared contracts, and Playwright e2e
-> are still being wired up.
+> The dashboard loads learners and progress from the API. The weekly activity chart,
+> shared contracts, and Playwright e2e are still planned.
+> Dashboard styling uses Tailwind utilities and light and dark color tokens defined in
+> `client/src/index.css`.
 
-## Functions:
+## Planned v1 functions:
 
-1. Show learner's name and program
-2. Show overall progress bar with percentage
-3. Show modules completed out of total
-4. Light and Dark theme
+1. Select an available demo learner
+2. Show learner's name and enrolled program
+3. Show overall progress percentage and modules completed out of total
+4. Show the most recent lesson activity, or "No activity yet"
+5. Show a weekly chart of completed lessons (still to implement)
+6. Light and Dark theme
 
 ## User flow (v1)
 
 ```text
 Open Learning Platform
         ↓
-Open demo learner (no sign-in)
+Select a demo learner (no sign-in)
         ↓
 Open Learning Progress Dashboard
         ↓
 View learner name + enrolled program
         ↓
-View overall progress and modules completed / total
+View progress, modules completed / total, and last activity
         ↓
 Select a module
         ↓
@@ -79,11 +82,36 @@ View results     Complete lessons
 
 ## v1 scope
 
-v1 is a read-only demo: one seeded program with five learners at different progress stages,
-and no sign-in, registration, or password reset. The dashboard opens a fixed demo learner; the
-other seeded learners are fixtures for the different progress states. Progress is seeded, so
-the "Complete lessons" loop in the post-MVP flow is not part of v1. See
+v1 is a planned read-only demo: one seeded program with five learners at different progress
+stages, and no sign-in, registration, or password reset. The dashboard will offer a dropdown
+to select a demo learner. Anyone who can access the demo can view their data; selection is
+not authentication. Progress is seeded, so the "Complete lessons" loop in the post-MVP flow
+is not part of v1. Last activity will be the latest recorded lesson access across the
+selected learner's progress records, or "No activity yet" when none exists. See
 `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
+
+## Current status
+
+The read-only demo dashboard is connected to the Express API and SQLite seed data. It supports
+learner selection, displays learner and program details, lesson and module progress, and last
+activity, and includes light/dark themes. The API also returns weekly lesson-completion data,
+but the dashboard chart is not implemented yet.
+
+The repository has workspace checks and tests for the client, server, shared scaffold, and
+database. The shared workspace does not yet contain the planned shared progress calculation or
+Zod API contracts; progress is currently calculated by the server, and the client validates API
+responses locally.
+
+## Next implementation steps
+
+1. Render the API's weekly completion data as a dashboard chart, including an empty state.
+2. Implement the planned read-only module list and module-detail view, if they remain part of v1.
+3. Move progress calculation and API contracts into `shared/`, then update server and client to
+   use them.
+4. Add Playwright end-to-end coverage for learner selection, loading/error states, and both
+   themes.
+
+Authentication and lesson-completion writes remain post-MVP; v1 is a read-only demo.
 
 ## Development
 
@@ -111,6 +139,11 @@ npm run dev
 Open the URL printed by Vite. Its development proxy forwards `/api` requests
 to the server on port 3000. The health endpoint is available at
 `http://localhost:3000/api/health`.
+
+The server provides `GET /api/learners` and `GET /api/learners/:id/progress`.
+The latter reports weekly lesson completions grouped by UTC weeks starting on Monday.
+It currently uses the learner's first enrollment when multiple exist. The dashboard
+loads both endpoints through the Vite proxy.
 
 Run the workspace checks from the repository root:
 

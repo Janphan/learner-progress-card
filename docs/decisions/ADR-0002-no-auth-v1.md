@@ -1,9 +1,11 @@
 # ADR-0002: No authentication in v1
 
-- **Status:** Accepted (revisit after the demo)
+- **Status:** Accepted (read-only demo implemented)
 - **Date:** 2026-11-07
 - **Supersedes:** none
-- **Related:** `docs/decisions/ADR-0001-data-model.md`
+- **Related:** `docs/decisions/ADR-0001-data-model.md`,
+  `docs/decisions/ADR-0004-frontend-styling-and-preview.md`, `server/routes/learners.ts`,
+  `client/src/learnerApi.ts`
 
 ## Context
 
@@ -21,15 +23,18 @@ the lack of auth does not become an implicit, undocumented shortcut.
 v1 has no authentication, registration, password reset, sessions, or tokens.
 
 - One program with five demo learners at different progress stages is seeded.
-- The dashboard loads a fixed seeded learner directly; there is no login screen or learner
-  switcher.
-- The API exposes a read-only demo entry point, `GET /api/demo/learner`, plus read-only
-  progress and module endpoints. That entry point returns the fixed demo learner; the other
-  seeded learners are available by id for tests and future demo states. The demo endpoint is
-  the seam that authentication replaces later: it becomes "current session user."
+- The dashboard offers a dropdown to select an available demo learner without signing in.
+- The API exposes read-only endpoints for listing demo learners and retrieving the selected
+  learner's profile and progress. Progress is calculated on the server.
+- Last activity is the latest non-null `lesson_progress.last_accessed_at` across the selected
+  learner's progress records. If none exists, the API returns `null` and the dashboard displays
+  "No activity yet".
 - The demo is read-only in v1. Progress is seeded rather than written from the UI. If the demo
   later needs "mark lesson complete," allow it only for the seeded learners and document that
   there is no data isolation.
+- The dashboard loads the learner list and progress from the API (`client/src/learnerApi.ts`);
+  the temporary preview-data scaffold has been removed. The API remains the source of truth and
+  responses are validated at the client boundary. See ADR-0004.
 - Do not deploy write endpoints publicly without authentication.
 
 ## Consequences
@@ -38,15 +43,15 @@ v1 has no authentication, registration, password reset, sessions, or tokens.
 
 - Much smaller v1: no credential handling, session storage, email, or protected-route
   middleware.
-- The dashboard user flow is reachable in one step, which is better for a demo.
+- The dashboard can show multiple seeded progress states without signing in.
 - The core schema is already auth-ready: `users`, `enrollments`, and `lesson_progress` do not
   need to change.
 
 **Negative / trade-offs**
 
-- No per-user data isolation. Every client that can reach the API sees the fixed demo learner
-  unless it requests another seeded learner by id.
-- No real "resume session" behavior; reloading simply reloads the seeded demo learner.
+- No per-user data isolation. Any client that can reach the API can view the available demo
+  learners and their progress.
+- No real "resume session" behavior or authenticated account switching.
 - Theme cannot sync across devices, so it stays in `localStorage` (see ADR-0001).
 - Adding auth later will touch the API boundary and client bootstrapping, though not the data
   model.
@@ -65,6 +70,10 @@ v1 has no authentication, registration, password reset, sessions, or tokens.
 
 - [x] Remove "Sign in / Resume Session" from the v1 user flow or label it post-MVP.
       **Done:** `README.md` now documents a read-only v1 flow and a separate post-MVP flow.
-- [ ] When auth is added, introduce session middleware and replace `/api/demo/learner` with
-      the current-user endpoint; keep the response shape stable.
+- [x] Implement the read-only demo learner and progress endpoints. **Done:**
+      `server/routes/learners.ts`.
+- [x] Connect the dashboard to those endpoints and remove the preview data. **Done:**
+      `client/src/learnerApi.ts`; preview data was removed in `a2d5b2b`.
+- [ ] When auth is added, introduce session middleware and replace unrestricted demo learner
+      selection with authorized access to learner data.
 - [ ] Revisit theme syncing at the same time, since it depends on a stable identity.

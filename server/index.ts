@@ -1,5 +1,8 @@
 import express, { Request, Response } from 'express'
 import { Server } from 'http'
+import Database from 'better-sqlite3'
+import { resolve } from 'node:path'
+import { createLearnerRouter } from './routes/learners'
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000
@@ -23,6 +26,15 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Express production-ready template' });
 });
+
+// npm runs the server workspace with server/ as the working directory.
+const databasePath = process.env.DATABASE_PATH
+    ?? resolve(process.cwd(), '../database/data/learner-progress.db')
+
+const sqlite = new Database(databasePath, { fileMustExist: true })
+sqlite.pragma('foreign_keys = ON')
+
+app.use('/api/learners', createLearnerRouter(sqlite))
 
 // Start the server
 const server: Server = app.listen(PORT, () => {
