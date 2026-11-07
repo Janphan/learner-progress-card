@@ -1,19 +1,36 @@
 # Data model
 
+## Conventions
+
+These apply to every table unless a column says otherwise.
+
+- **IDs:** `integer primary key autoincrement`. IDs are integers in the API and URLs.
+- **Timestamps:** stored as UTC ISO-8601 `text` (for example `2026-11-07T10:15:30.000Z`).
+  `created_at` is set on insert; `updated_at` is set by application code on every update.
+  SQLite has no automatic `updated_at`, so v1 uses no trigger.
+- **Nullability:** every column is `NOT NULL` unless it is marked *nullable* below.
+- **Email:** `text`, `NOT NULL`, `UNIQUE`, `COLLATE NOCASE`.
+- **Enums:** stored as `text` with a check constraint listing the allowed values.
+- **Foreign keys:** enforced per connection; every connection must run
+  `PRAGMA foreign_keys = ON`.
+- **Theme:** client-side only in v1 (`localStorage`); there is no `users.theme_preference`
+  column. See `docs/decisions/ADR-0001-data-model.md`.
+
 ## Core tables
 
 ### 1. users
 
-Stores learner information and theme preference.
+Stores learner identity.
 
 | Column | Constraints / Notes |
 | :--- | :--- |
-| id | PK |
-| name | — |
-| email | unique |
-| theme_preference | `light`, `dark`, `system` |
-| created_at | — |
-| updated_at | — |
+| id | integer PK, autoincrement |
+| name | text, NOT NULL |
+| email | text, NOT NULL, UNIQUE, `COLLATE NOCASE` |
+| created_at | text, NOT NULL, UTC ISO-8601 |
+| updated_at | text, NOT NULL, UTC ISO-8601 |
+
+Users do not store a theme preference; theme is per-device in v1.
 
 ### 2. programs
 
@@ -21,12 +38,12 @@ Represents a course or learning program.
 
 | Column | Constraints / Notes |
 | :--- | :--- |
-| id | PK |
-| title | — |
-| description | — |
-| status | `draft`, `published`, `archived` |
-| created_at | — |
-| updated_at | — |
+| id | integer PK, autoincrement |
+| title | text, NOT NULL |
+| description | text, *nullable* |
+| status | text, NOT NULL, check: `draft`, `published`, `archived` |
+| created_at | text, NOT NULL, UTC ISO-8601 |
+| updated_at | text, NOT NULL, UTC ISO-8601 |
 
 ### 3. modules
 
@@ -34,13 +51,13 @@ A program contains multiple ordered modules.
 
 | Column | Constraints / Notes |
 | :--- | :--- |
-| id | PK |
-| program_id | FK → `programs.id` |
-| title | — |
-| description | — |
-| position | positive integer; unique within program |
-| created_at | — |
-| updated_at | — |
+| id | integer PK, autoincrement |
+| program_id | integer, NOT NULL, FK → `programs.id` |
+| title | text, NOT NULL |
+| description | text, *nullable* |
+| position | integer, NOT NULL, `> 0`; unique within program |
+| created_at | text, NOT NULL, UTC ISO-8601 |
+| updated_at | text, NOT NULL, UTC ISO-8601 |
 
 Constraints:
 
@@ -53,15 +70,15 @@ A module contains multiple lessons.
 
 | Column | Constraints / Notes |
 | :--- | :--- |
-| id | PK |
-| module_id | FK → `modules.id` |
-| program_id | FK → `programs.id`; denormalized for integrity |
-| title | — |
-| content_type | `video`, `article`, `quiz` |
-| position | positive integer; unique within module |
-| duration_minutes | — |
-| created_at | — |
-| updated_at | — |
+| id | integer PK, autoincrement |
+| module_id | integer, NOT NULL, FK → `modules.id` |
+| program_id | integer, NOT NULL, FK → `programs.id`; denormalized for integrity |
+| title | text, NOT NULL |
+| content_type | text, NOT NULL, check: `video`, `article`, `quiz` |
+| position | integer, NOT NULL, `> 0`; unique within module |
+| duration_minutes | integer, NOT NULL, `>= 0` |
+| created_at | text, NOT NULL, UTC ISO-8601 |
+| updated_at | text, NOT NULL, UTC ISO-8601 |
 
 Constraints:
 
@@ -75,18 +92,23 @@ Connects users to programs. This supports users joining multiple programs and pr
 
 | Column | Constraints / Notes |
 | :--- | :--- |
-| id | PK |
-| user_id | FK → `users.id` |
-| program_id | FK → `programs.id` |
-| enrolled_at | — |
-| started_at | — |
-| completed_at | — |
-| status | `enrolled`, `active`, `completed`, `withdrawn` |
+| id | integer PK, autoincrement |
+| user_id | integer, NOT NULL, FK → `users.id` |
+| program_id | integer, NOT NULL, FK → `programs.id` |
+| enrolled_at | text, NOT NULL, UTC ISO-8601 |
+| started_at | text, *nullable*, UTC ISO-8601 |
+| completed_at | text, *nullable*, UTC ISO-8601 |
+| status | text, NOT NULL, check: `enrolled`, `active`, `completed`, `withdrawn` |
 
 Constraints:
 
 - Unique `(user_id, program_id)`.
 - Unique `(id, program_id)` — required so `lesson_progress` can reference both columns.
+- Check `(status = 'enrolled' AND started_at IS NULL AND completed_at IS NULL)`.
+- Check `(status = 'active' AND started_at IS NOT NULL AND completed_at IS NULL)`.
+- Check `(status = 'completed' AND started_at IS NOT NULL AND completed_at IS NOT NULL)`.
+- Check `(status = 'withdrawn' AND completed_at IS NULL)`.
+- Check `(completed_at IS NULL OR started_at IS NULL OR completed_at >= started_at)`.
 
 ### 6. lesson_progress
 
@@ -94,15 +116,15 @@ Tracks each learner's progress through individual lessons.
 
 | Column | Constraints / Notes |
 | :--- | :--- |
-| id | PK |
-| enrollment_id | FK → `enrollments.id` |
-| lesson_id | FK → `lessons.id` |
-| program_id | FK → `programs.id`; denormalized for integrity |
-| status | `not_started`, `in_progress`, `completed` |
-| progress_percent | integer 0–100, not null, default 0 |
-| started_at | — |
-| completed_at | — |
-| last_accessed_at | — |
+| id | integer PK, autoincrement |
+| enrollment_id | integer, NOT NULL, FK → `enrollments.id` |
+| lesson_id | integer, NOT NULL, FK → `lessons.id` |
+| program_id | integer, NOT NULL, FK → `programs.id`; denormalized for integrity |
+| status | text, NOT NULL, check: `not_started`, `in_progress`, `completed` |
+| progress_percent | integer, NOT NULL, default `0`, check `0`–`100` |
+| started_at | text, *nullable*, UTC ISO-8601 |
+| completed_at | text, *nullable*, UTC ISO-8601 |
+| last_accessed_at | text, *nullable*, UTC ISO-8601 |
 
 Constraints:
 
