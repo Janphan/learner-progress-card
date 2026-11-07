@@ -64,3 +64,6 @@ Thumbs.db
 
 # Misc
 *.local
+
+# Local working files (not part of the repo)
+local.plan.md
