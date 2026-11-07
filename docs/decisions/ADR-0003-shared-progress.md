@@ -1,10 +1,12 @@
 # ADR-0003: Single shared progress calculation
 
-- **Status:** Accepted
+- **Status:** Accepted (shared implementation pending)
 - **Date:** 2026-11-07
 - **Supersedes:** none
 - **Related:** `database/README.md`, `docs/decisions/ADR-0001-data-model.md`,
-  `docs/decisions/ADR-0002-no-auth-v1.md`, `shared/src/progress.ts`
+  `docs/decisions/ADR-0002-no-auth-v1.md`,
+  `docs/decisions/ADR-0004-frontend-styling-and-preview.md`, `shared/src/progress.ts` (planned),
+  `server/learners/progress.ts` (temporary)
 
 ## Context
 
@@ -18,15 +20,22 @@ The local plan already requires progress to be computed in one place (`shared/`)
 small, typed, testable implementation that both the server and the client can import without
 depending on Drizzle or database row shapes.
 
+> **Implementation status:** Phase 4 is still pending. `shared/src/progress.ts` and its tests
+> have not been implemented. The server currently calculates progress in
+> `server/learners/progress.ts` and returns it from `GET /api/learners/:id/progress`; the client
+> renders those API values and does not calculate progress. That keeps a single runtime
+> calculation, but it is not the shared location required by this decision. Moving the
+> calculation into `shared/` remains the next step.
+
 ## Decision
 
-`computeProgress()` in `shared/src/progress.ts` is the **single** progress implementation. It
-is exported from the package entry point (`shared/src/index.ts`) together with its
+`computeProgress()` in `shared/src/progress.ts` will be the **single** progress implementation. It
+will be exported from the package entry point (`shared/src/index.ts`) together with its
 `LessonStatus` and `ProgressModule` types.
 
 ### Input
 
-The function accepts a narrow structural type rather than a database row:
+The function will accept a narrow structural type rather than a database row:
 
 ```ts
 type ProgressModule = {
@@ -57,14 +66,14 @@ as not completed.
 
 ### Integration
 
-- The server maps Drizzle rows into `ProgressModule[]` and calls `computeProgress()` instead
-  of duplicating the rules in SQL aggregates.
+- The server will map database rows into `ProgressModule[]` and call `computeProgress()` instead
+  of keeping progress rules in the route layer.
 - The client renders the progress values returned by the API. If a future flow computes
   progress locally (for example, optimistic updates), it must import the same function.
 - The function stays free of database, Express, and React imports so both workspaces can use
   it.
 
-Unit tests in `shared/src/progress.test.ts` cover normal completion, rounding, and empty
+Unit tests in `shared/src/progress.test.ts` will cover normal completion, rounding, and empty
 modules.
 
 ## Consequences
@@ -77,6 +86,9 @@ modules.
 
 **Negative / trade-offs**
 
+- The server currently computes progress in a temporary module, so the planned shared function has
+  not yet eliminated duplication by location. The calculation is tested and client-independent in
+  the meantime.
 - The server loads lesson statuses and computes in application code instead of a single SQL
   aggregate. That is fine at demo scale but may need revisiting for large programs.
 - Callers must map database rows into `ProgressModule[]`; the mapping is another place to get
@@ -94,9 +106,12 @@ modules.
 
 ## Follow-ups
 
-- [ ] Map Drizzle rows into `ProgressModule[]` in the server repository and return
+- [ ] Implement `computeProgress()` and its unit tests in `shared/`.
+- [ ] Move the server's temporary `calculateProgress()` into `shared/` and import it from the
+      learner progress endpoint instead of `server/learners/progress.ts`.
+- [ ] Map database rows into `ProgressModule[]` in the server repository and return
       `computeProgress()` output from the learner progress endpoint.
-- [ ] Add shared Zod schemas for the progress request/response contract.
-- [ ] Keep the client on API-provided values; import `computeProgress()` if local calculation
-      is ever needed.
+- [ ] Add shared Zod schemas for the progress request/response contract; validate at the server
+      boundary and replace the client's hand-written response checks.
+- [x] Use API-provided progress in the client; preview data was removed in `a2d5b2b`.
 - [ ] Revisit SQL aggregation only if program sizes make in-process calculation too expensive.

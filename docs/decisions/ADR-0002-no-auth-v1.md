@@ -1,9 +1,11 @@
 # ADR-0002: No authentication in v1
 
-- **Status:** Accepted (revisit after the demo)
+- **Status:** Accepted (read-only demo implemented)
 - **Date:** 2026-11-07
 - **Supersedes:** none
-- **Related:** `docs/decisions/ADR-0001-data-model.md`
+- **Related:** `docs/decisions/ADR-0001-data-model.md`,
+  `docs/decisions/ADR-0004-frontend-styling-and-preview.md`, `server/routes/learners.ts`,
+  `client/src/learnerApi.ts`
 
 ## Context
 
@@ -30,6 +32,9 @@ v1 has no authentication, registration, password reset, sessions, or tokens.
 - The demo is read-only in v1. Progress is seeded rather than written from the UI. If the demo
   later needs "mark lesson complete," allow it only for the seeded learners and document that
   there is no data isolation.
+- The dashboard loads the learner list and progress from the API (`client/src/learnerApi.ts`);
+  the temporary preview-data scaffold has been removed. The API remains the source of truth and
+  responses are validated at the client boundary. See ADR-0004.
 - Do not deploy write endpoints publicly without authentication.
 
 ## Consequences
@@ -65,6 +70,10 @@ v1 has no authentication, registration, password reset, sessions, or tokens.
 
 - [x] Remove "Sign in / Resume Session" from the v1 user flow or label it post-MVP.
       **Done:** `README.md` now documents a read-only v1 flow and a separate post-MVP flow.
+- [x] Implement the read-only demo learner and progress endpoints. **Done:**
+      `server/routes/learners.ts`.
+- [x] Connect the dashboard to those endpoints and remove the preview data. **Done:**
+      `client/src/learnerApi.ts`; preview data was removed in `a2d5b2b`.
 - [ ] When auth is added, introduce session middleware and replace unrestricted demo learner
       selection with authorized access to learner data.
 - [ ] Revisit theme syncing at the same time, since it depends on a stable identity.

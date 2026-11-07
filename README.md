@@ -90,9 +90,28 @@ is not part of v1. Last activity will be the latest recorded lesson access acros
 selected learner's progress records, or "No activity yet" when none exists. See
 `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
 
-## Remaining v1 work
+## Current status
 
-- Display the API's weekly lesson-completion data as a line or bar chart.
+The read-only demo dashboard is connected to the Express API and SQLite seed data. It supports
+learner selection, displays learner and program details, lesson and module progress, and last
+activity, and includes light/dark themes. The API also returns weekly lesson-completion data,
+but the dashboard chart is not implemented yet.
+
+The repository has workspace checks and tests for the client, server, shared scaffold, and
+database. The shared workspace does not yet contain the planned shared progress calculation or
+Zod API contracts; progress is currently calculated by the server, and the client validates API
+responses locally.
+
+## Next implementation steps
+
+1. Render the API's weekly completion data as a dashboard chart, including an empty state.
+2. Implement the planned read-only module list and module-detail view, if they remain part of v1.
+3. Move progress calculation and API contracts into `shared/`, then update server and client to
+   use them.
+4. Add Playwright end-to-end coverage for learner selection, loading/error states, and both
+   themes.
+
+Authentication and lesson-completion writes remain post-MVP; v1 is a read-only demo.
 
 ## Development
 
