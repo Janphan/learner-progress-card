@@ -20,10 +20,12 @@ afterEach(() => vi.unstubAllGlobals())
 describe('learner API', () => {
   it('loads learner options and allows an empty list', async () => {
     const fetchMock = vi.fn()
-      .mockResolvedValueOnce(Response.json([{ id: 1, name: 'Alex' }]))
+      .mockResolvedValueOnce(Response.json([{ id: 1, name: 'Alex', program: 'Program' }]))
       .mockResolvedValueOnce(Response.json([]))
     vi.stubGlobal('fetch', fetchMock)
-    await expect(fetchLearners(signal)).resolves.toEqual([{ id: 1, name: 'Alex' }])
+    await expect(fetchLearners(signal)).resolves.toEqual([
+      { id: 1, name: 'Alex', program: 'Program' },
+    ])
     await expect(fetchLearners(signal)).resolves.toEqual([])
     expect(fetchMock).toHaveBeenCalledWith('/api/learners', { signal })
   })
@@ -38,11 +40,13 @@ describe('learner API', () => {
   it('reports failed requests and malformed responses', async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(new Response(null, { status: 503 }))
-      .mockResolvedValueOnce(Response.json([{ id: '1', name: 'Alex' }]))
+      .mockResolvedValueOnce(Response.json([{ id: '1', name: 'Alex', program: 'Program' }]))
+      .mockResolvedValueOnce(Response.json([{ id: 1, name: 'Alex', program: 42 }]))
       .mockResolvedValueOnce(Response.json({ ...progress, lastActivityAt: 'bad date' }))
       .mockResolvedValueOnce(Response.json({ ...progress, id: 2 }))
     vi.stubGlobal('fetch', fetchMock)
     await expect(fetchLearners(signal)).rejects.toThrow('503')
+    await expect(fetchLearners(signal)).rejects.toThrow('invalid learner list')
     await expect(fetchLearners(signal)).rejects.toThrow('invalid learner list')
     await expect(fetchLearnerProgress(1, signal)).rejects.toThrow('invalid learner progress')
     await expect(fetchLearnerProgress(1, signal)).rejects.toThrow('invalid learner progress')

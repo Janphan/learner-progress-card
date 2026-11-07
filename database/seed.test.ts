@@ -46,6 +46,28 @@ describe('seedDatabase', () => {
     )
   })
 
+  it('assigns seeded learners to varied programs', () => {
+    seedDatabase(sqlite)
+
+    const learnerPrograms = sqlite
+      .prepare(`
+        SELECT users.name, programs.title AS program
+        FROM users
+        JOIN enrollments ON enrollments.user_id = users.id
+        JOIN programs ON programs.id = enrollments.program_id
+        ORDER BY users.name
+      `)
+      .all() as Array<{ name: string; program: string }>
+
+    expect(learnerPrograms).toEqual([
+      { name: 'Alex Morgan', program: 'Demo: Learning Foundations' },
+      { name: 'Casey Patel', program: 'Demo: Data Literacy' },
+      { name: 'Jordan Lee', program: 'Demo: Learning Foundations' },
+      { name: 'Riley Chen', program: 'Demo: Product Design' },
+      { name: 'Taylor Brooks', program: 'Demo: Data Literacy' },
+    ])
+  })
+
   it('is idempotent', () => {
     seedDatabase(sqlite)
     seedDatabase(sqlite)
@@ -64,9 +86,9 @@ describe('seedDatabase', () => {
 
     expect(counts).toEqual({
       users: 5,
-      programs: 1,
-      modules: 3,
-      lessons: 9,
+      programs: 3,
+      modules: 9,
+      lessons: 27,
       enrollments: 5,
       lesson_progress: 45,
     })

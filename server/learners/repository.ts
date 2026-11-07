@@ -3,6 +3,7 @@ import type Database from 'better-sqlite3'
 export interface Learner {
   id: number
   name: string
+  program: string | null
 }
 
 export interface LearnerEnrollment extends Learner {
@@ -23,7 +24,19 @@ export interface WeeklyCompletion {
 }
 
 export function listLearners(sqlite: Database.Database): Learner[] {
-  return sqlite.prepare<[], Learner>('SELECT id, name FROM users ORDER BY name').all()
+  return sqlite.prepare<[], Learner>(`
+    SELECT u.id, u.name, p.title AS program
+    FROM users u
+    LEFT JOIN enrollments e ON e.id = (
+      SELECT e1.id
+      FROM enrollments e1
+      WHERE e1.user_id = u.id
+      ORDER BY e1.id
+      LIMIT 1
+    )
+    LEFT JOIN programs p ON p.id = e.program_id
+    ORDER BY u.name
+  `).all()
 }
 
 export function findLearner(sqlite: Database.Database, id: number): LearnerEnrollment | undefined {

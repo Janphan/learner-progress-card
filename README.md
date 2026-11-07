@@ -82,7 +82,7 @@ View results     Complete lessons
 
 ## v1 scope
 
-v1 is a planned read-only demo: one seeded program with five learners at different progress
+v1 is a planned read-only demo: three seeded programs with five learners at different progress
 stages, and no sign-in, registration, or password reset. The dashboard will offer a dropdown
 to select a demo learner. Anyone who can access the demo can view their data; selection is
 not authentication. Progress is seeded, so the "Complete lessons" loop in the post-MVP flow
@@ -161,9 +161,9 @@ npm run db:migrate
 npm run db:seed
 ```
 
-The seed command creates one demo program with three modules and nine lessons, plus five
-learners at different stages: not started, early progress, mid-progress, nearly complete,
-and completed. It is safe to run repeatedly.
+The seed command creates three demo programs with three modules and nine lessons each, plus
+five learners assigned across the programs at different progress stages: not started, early
+progress, mid-progress, nearly complete, and completed. It is safe to run repeatedly.
 
 After changing `database/schema.ts`, generate a new migration before applying it:
 

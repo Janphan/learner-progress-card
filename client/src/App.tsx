@@ -126,7 +126,9 @@ function App() {
             setSelectedId(Number(event.target.value))
           }}>
             {list.learners.map((item) => (
-              <option key={item.id} value={item.id}>{item.name}</option>
+              <option key={item.id} value={item.id}>
+                {item.name} — {item.program ?? 'No program enrolled'}
+              </option>
             ))}
           </select>
         </div>
