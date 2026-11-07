@@ -119,4 +119,22 @@ npm test
 npm run build
 ```
 
-Database and end-to-end commands will be added once those layers are scaffolded.
+Create or update the local SQLite database from the committed migrations:
+
+```bash
+npm run db:migrate
+```
+
+After changing `database/schema.ts`, generate a new migration before applying it:
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+Set `DATABASE_PATH` to use a different database file (see `.env.example`). Generated
+migrations in `database/migrations/` are committed; the database file under `database/data/`
+is ignored. `npm test` includes the database tests, which run the migrations against an
+in-memory database and verify the schema constraints.
+
+End-to-end commands will be added once Playwright is configured.

@@ -12,8 +12,23 @@
     "dev:server": "npm run dev -w @learner-progress/server",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start -w @learner-progress/server",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tsconfig.database.json",
     "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present && npm run test:db",
+    "test:db": "vitest run database",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx database/migrate.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.6",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.0"
   }
 }
