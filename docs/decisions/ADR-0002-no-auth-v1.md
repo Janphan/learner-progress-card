@@ -22,7 +22,8 @@ the lack of auth does not become an implicit, undocumented shortcut.
 
 v1 has no authentication, registration, password reset, sessions, or tokens.
 
-- One program with five demo learners at different progress stages is seeded.
+- Three programs with five demo learners distributed across them at different progress stages are
+  seeded.
 - The dashboard offers a dropdown to select an available demo learner without signing in.
 - The API exposes read-only endpoints for listing demo learners and retrieving the selected
   learner's profile and progress. Progress is calculated on the server.
