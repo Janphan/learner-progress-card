@@ -121,6 +121,11 @@ Open the URL printed by Vite. Its development proxy forwards `/api` requests
 to the server on port 3000. The health endpoint is available at
 `http://localhost:3000/api/health`.
 
+The server provides `GET /api/learners` and `GET /api/learners/:id/progress`.
+The latter reports weekly lesson completions grouped by UTC weeks starting on Monday.
+It currently uses the learner's first enrollment when multiple exist. The preview
+dashboard does not yet request these endpoints.
+
 Run the workspace checks from the repository root:
 
 ```bash
