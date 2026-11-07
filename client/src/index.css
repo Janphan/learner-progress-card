@@ -9,6 +9,7 @@
   --color-dashboard-muted: var(--color-muted);
   --color-dashboard-accent: var(--color-accent);
   --color-dashboard-track: var(--color-track);
+  --color-dashboard-border: var(--color-border);
   --color-dashboard-success: var(--color-success);
 }
 
@@ -19,6 +20,7 @@
   --color-muted: #5b6270;
   --color-accent: #2457d6;
   --color-track: #e3e6eb;
+  --color-border: #c3ccda;
   --color-success: #1e7f4f;
   color-scheme: light;
 }
@@ -30,6 +32,7 @@
   --color-muted: #a3aab6;
   --color-accent: #7aa2ff;
   --color-track: #2c313a;
+  --color-border: #454d5b;
   --color-success: #4cc38a;
   color-scheme: dark;
 }

@@ -89,7 +89,7 @@ function App() {
             <h1 className="m-0 text-[30px] leading-[1.15] font-bold tracking-[-1.2px] max-[480px]:text-[26px]">Learner progress</h1>
           </div>
           <button
-            className="grid size-10 cursor-pointer place-items-center rounded-[9px] border border-dashboard-track bg-dashboard-bg text-dashboard-muted focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-dashboard-accent"
+            className="grid size-10 cursor-pointer place-items-center rounded-[9px] border border-dashboard-border bg-dashboard-bg text-dashboard-muted focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-dashboard-accent"
             type="button"
             aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
             onClick={toggleTheme}
@@ -121,7 +121,7 @@ function App() {
           <>
         <div className="my-[15px]">
           <label className="mb-2 block text-[14px] font-semibold text-dashboard-muted" htmlFor="learner">View learner</label>
-          <select className="min-h-11 w-full cursor-pointer rounded-[9px] border border-dashboard-track bg-dashboard-surface px-[15px] text-dashboard-text focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-dashboard-accent" id="learner" value={selectedId ?? ''} onChange={(event) => {
+          <select className="min-h-11 w-full cursor-pointer rounded-[9px] border border-dashboard-border bg-dashboard-surface px-[15px] text-dashboard-text focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-dashboard-accent" id="learner" value={selectedId ?? ''} onChange={(event) => {
             setProgressResult(null)
             setSelectedId(Number(event.target.value))
           }}>
@@ -140,7 +140,7 @@ function App() {
         )}
         {learner && (
         <section className="rounded-xl bg-dashboard-surface p-8 max-[480px]:p-[22px]" aria-label={`${learner.name} progress`}>
-          <div className="flex items-center gap-4 border-b border-dashboard-track pb-6">
+          <div className="flex items-center gap-4 border-b border-dashboard-border pb-6">
             <span className="grid h-[46px] flex-[0_0_46px] place-items-center rounded-full text-[14px] font-bold text-dashboard-accent [background:color-mix(in_srgb,var(--color-accent)_10%,var(--color-surface))]" aria-hidden="true">{initials}</span>
             <div>
               <h2 className="mt-0 mb-[5px] text-[17px] font-bold tracking-[-0.3px]">{learner.name}</h2>
@@ -148,7 +148,7 @@ function App() {
             </div>
           </div>
 
-          <div className="border-b border-dashboard-track py-6">
+          <div className="border-b border-dashboard-border py-6">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h3 className="mt-0 mb-1 text-[14px] font-semibold text-dashboard-muted">Overall progress</h3>
@@ -175,10 +175,10 @@ function App() {
             )}
           </div>
 
-          <div className="border-b border-dashboard-track py-6">
+          <div className="border-b border-dashboard-border py-6">
             <h3 className="mt-0 mb-1 text-[14px] font-semibold">Lessons completed</h3>
             <p className="m-0 text-[12px] text-dashboard-muted">Weekly activity chart coming later</p>
-            <div className="mt-4 grid min-h-[130px] place-items-center rounded-lg border border-dashed border-dashboard-track text-center text-[13px] text-dashboard-muted">Weekly activity chart is not implemented yet.</div>
+            <div className="mt-4 grid min-h-[130px] place-items-center rounded-lg border border-dashed border-dashboard-border text-center text-[13px] text-dashboard-muted">Weekly activity chart is not implemented yet.</div>
           </div>
 
           <div className="grid grid-cols-2 pt-6 max-[480px]:gap-3">
@@ -186,7 +186,7 @@ function App() {
               <p className="m-0 text-[12px] text-dashboard-muted">Modules completed</p>
               <strong className="mt-2 block text-[16px]">{learner.completedModules} of {learner.totalModules}</strong>
             </div>
-            <div className="border-l border-dashboard-track pl-4">
+            <div className="border-l border-dashboard-border pl-4">
               <p className="m-0 text-[12px] text-dashboard-muted">Last activity</p>
               <strong className="mt-2 block text-[16px]">{formatActivity(learner.lastActivityAt)}</strong>
             </div>
