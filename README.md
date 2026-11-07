@@ -25,8 +25,8 @@
 | Testing | Vitest + Playwright | Unit/DB/API tests and end-to-end user flows |
 | Runtime | Node.js | Server process and tooling |
 
-> The dashboard currently displays labeled, precomputed preview data and is not connected to
-> the learner API. Weekly activity, shared contracts, and Playwright e2e are still planned.
+> The dashboard loads learners and progress from the API. The weekly activity chart,
+> shared contracts, and Playwright e2e are still planned.
 > Dashboard styling uses Tailwind utilities and light and dark color tokens defined in
 > `client/src/index.css`.
 
@@ -36,7 +36,8 @@
 2. Show learner's name and enrolled program
 3. Show overall progress percentage and modules completed out of total
 4. Show the most recent lesson activity, or "No activity yet"
-5. Light and Dark theme
+5. Show a weekly chart of completed lessons (still to implement)
+6. Light and Dark theme
 
 ## User flow (v1)
 
@@ -89,10 +90,9 @@ is not part of v1. Last activity will be the latest recorded lesson access acros
 selected learner's progress records, or "No activity yet" when none exists. See
 `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
 
-## Future work
+## Remaining v1 work
 
-- Add weekly activity data for a line or bar chart. Activity events, time zones, and week
-  boundaries will be defined before implementation.
+- Display the API's weekly lesson-completion data as a line or bar chart.
 
 ## Development
 
@@ -123,8 +123,8 @@ to the server on port 3000. The health endpoint is available at
 
 The server provides `GET /api/learners` and `GET /api/learners/:id/progress`.
 The latter reports weekly lesson completions grouped by UTC weeks starting on Monday.
-It currently uses the learner's first enrollment when multiple exist. The preview
-dashboard does not yet request these endpoints.
+It currently uses the learner's first enrollment when multiple exist. The dashboard
+loads both endpoints through the Vite proxy.
 
 Run the workspace checks from the repository root:
 
