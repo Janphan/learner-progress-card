@@ -30,7 +30,7 @@ playwright-report/
 test-results/
 *.lcov
 
-# Database artifacts
+# Database artifacts (generated migrations are tracked; local database files are not)
 *.sqlite
 *.sqlite3
 *.db

@@ -20,13 +20,15 @@ the lack of auth does not become an implicit, undocumented shortcut.
 
 v1 has no authentication, registration, password reset, sessions, or tokens.
 
-- One learner, one program, and partial lesson progress are seeded.
-- The dashboard loads the seeded learner directly; there is no login screen.
+- One program with five demo learners at different progress stages is seeded.
+- The dashboard loads a fixed seeded learner directly; there is no login screen or learner
+  switcher.
 - The API exposes a read-only demo entry point, `GET /api/demo/learner`, plus read-only
-  progress and module endpoints. The demo endpoint is the seam that authentication replaces
-  later: it becomes "current session user."
+  progress and module endpoints. That entry point returns the fixed demo learner; the other
+  seeded learners are available by id for tests and future demo states. The demo endpoint is
+  the seam that authentication replaces later: it becomes "current session user."
 - The demo is read-only in v1. Progress is seeded rather than written from the UI. If the demo
-  later needs "mark lesson complete," allow it only for the seeded learner and document that
+  later needs "mark lesson complete," allow it only for the seeded learners and document that
   there is no data isolation.
 - Do not deploy write endpoints publicly without authentication.
 
@@ -42,8 +44,9 @@ v1 has no authentication, registration, password reset, sessions, or tokens.
 
 **Negative / trade-offs**
 
-- No per-user data isolation. Every client that can reach the API sees the same demo learner.
-- No real "resume session" behavior; reloading simply reloads the seeded learner.
+- No per-user data isolation. Every client that can reach the API sees the fixed demo learner
+  unless it requests another seeded learner by id.
+- No real "resume session" behavior; reloading simply reloads the seeded demo learner.
 - Theme cannot sync across devices, so it stays in `localStorage` (see ADR-0001).
 - Adding auth later will touch the API boundary and client bootstrapping, though not the data
   model.

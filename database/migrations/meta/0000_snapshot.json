@@ -1,0 +1,590 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "22c06834-950c-4ecd-89d0-7d066bc30d38",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "enrollments": {
+      "name": "enrollments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "program_id": {
+          "name": "program_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "enrolled_at": {
+          "name": "enrolled_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "enrollments_user_program_unique": {
+          "name": "enrollments_user_program_unique",
+          "columns": [
+            "user_id",
+            "program_id"
+          ],
+          "isUnique": true
+        },
+        "enrollments_id_program_unique": {
+          "name": "enrollments_id_program_unique",
+          "columns": [
+            "id",
+            "program_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "enrollments_user_id_users_id_fk": {
+          "name": "enrollments_user_id_users_id_fk",
+          "tableFrom": "enrollments",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "enrollments_program_id_programs_id_fk": {
+          "name": "enrollments_program_id_programs_id_fk",
+          "tableFrom": "enrollments",
+          "tableTo": "programs",
+          "columnsFrom": [
+            "program_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "enrollments_status_check": {
+          "name": "enrollments_status_check",
+          "value": "(\n                (\"enrollments\".\"status\" = 'enrolled' AND \"enrollments\".\"started_at\" IS NULL AND \"enrollments\".\"completed_at\" IS NULL)\n                OR (\"enrollments\".\"status\" = 'active' AND \"enrollments\".\"started_at\" IS NOT NULL AND \"enrollments\".\"completed_at\" IS NULL)\n                OR (\"enrollments\".\"status\" = 'completed' AND \"enrollments\".\"started_at\" IS NOT NULL AND \"enrollments\".\"completed_at\" IS NOT NULL)\n                OR (\"enrollments\".\"status\" = 'withdrawn' AND \"enrollments\".\"completed_at\" IS NULL)\n            )"
+        },
+        "enrollments_dates_check": {
+          "name": "enrollments_dates_check",
+          "value": "\"enrollments\".\"completed_at\" IS NULL OR \"enrollments\".\"started_at\" IS NULL OR \"enrollments\".\"completed_at\" >= \"enrollments\".\"started_at\""
+        }
+      }
+    },
+    "lesson_progress": {
+      "name": "lesson_progress",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "enrollment_id": {
+          "name": "enrollment_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lesson_id": {
+          "name": "lesson_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "program_id": {
+          "name": "program_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "progress_percent": {
+          "name": "progress_percent",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_accessed_at": {
+          "name": "last_accessed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lesson_progress_enrollment_lesson_unique": {
+          "name": "lesson_progress_enrollment_lesson_unique",
+          "columns": [
+            "enrollment_id",
+            "lesson_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "lesson_progress_enrollment_program_fk": {
+          "name": "lesson_progress_enrollment_program_fk",
+          "tableFrom": "lesson_progress",
+          "tableTo": "enrollments",
+          "columnsFrom": [
+            "enrollment_id",
+            "program_id"
+          ],
+          "columnsTo": [
+            "id",
+            "program_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lesson_progress_lesson_program_fk": {
+          "name": "lesson_progress_lesson_program_fk",
+          "tableFrom": "lesson_progress",
+          "tableTo": "lessons",
+          "columnsFrom": [
+            "lesson_id",
+            "program_id"
+          ],
+          "columnsTo": [
+            "id",
+            "program_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lesson_progress_percent_check": {
+          "name": "lesson_progress_percent_check",
+          "value": "\"lesson_progress\".\"progress_percent\" BETWEEN 0 AND 100"
+        },
+        "lesson_progress_status_check": {
+          "name": "lesson_progress_status_check",
+          "value": "(\n                (\"lesson_progress\".\"status\" = 'not_started' AND \"lesson_progress\".\"progress_percent\" = 0 AND \"lesson_progress\".\"completed_at\" IS NULL)\n                OR (\"lesson_progress\".\"status\" = 'in_progress' AND \"lesson_progress\".\"progress_percent\" > 0 AND \"lesson_progress\".\"progress_percent\" < 100 AND \"lesson_progress\".\"completed_at\" IS NULL)\n                OR (\"lesson_progress\".\"status\" = 'completed' AND \"lesson_progress\".\"progress_percent\" = 100 AND \"lesson_progress\".\"completed_at\" IS NOT NULL)\n            )"
+        }
+      }
+    },
+    "lessons": {
+      "name": "lessons",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "module_id": {
+          "name": "module_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "program_id": {
+          "name": "program_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "duration_minutes": {
+          "name": "duration_minutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "lessons_module_position_unique": {
+          "name": "lessons_module_position_unique",
+          "columns": [
+            "module_id",
+            "position"
+          ],
+          "isUnique": true
+        },
+        "lessons_id_program_unique": {
+          "name": "lessons_id_program_unique",
+          "columns": [
+            "id",
+            "program_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "lessons_program_id_programs_id_fk": {
+          "name": "lessons_program_id_programs_id_fk",
+          "tableFrom": "lessons",
+          "tableTo": "programs",
+          "columnsFrom": [
+            "program_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lessons_module_program_fk": {
+          "name": "lessons_module_program_fk",
+          "tableFrom": "lessons",
+          "tableTo": "modules",
+          "columnsFrom": [
+            "module_id",
+            "program_id"
+          ],
+          "columnsTo": [
+            "id",
+            "program_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "lessons_position_check": {
+          "name": "lessons_position_check",
+          "value": "\"lessons\".\"position\" > 0"
+        },
+        "lessons_duration_check": {
+          "name": "lessons_duration_check",
+          "value": "\"lessons\".\"duration_minutes\" >= 0"
+        },
+        "lessons_content_type_check": {
+          "name": "lessons_content_type_check",
+          "value": "\"lessons\".\"content_type\" IN ('video', 'article', 'quiz')"
+        }
+      }
+    },
+    "modules": {
+      "name": "modules",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "program_id": {
+          "name": "program_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "modules_program_position_unique": {
+          "name": "modules_program_position_unique",
+          "columns": [
+            "program_id",
+            "position"
+          ],
+          "isUnique": true
+        },
+        "modules_id_program_unique": {
+          "name": "modules_id_program_unique",
+          "columns": [
+            "id",
+            "program_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "modules_program_id_programs_id_fk": {
+          "name": "modules_program_id_programs_id_fk",
+          "tableFrom": "modules",
+          "tableTo": "programs",
+          "columnsFrom": [
+            "program_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "modules_position_check": {
+          "name": "modules_position_check",
+          "value": "\"modules\".\"position\" > 0"
+        }
+      }
+    },
+    "programs": {
+      "name": "programs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "programs_status_check": {
+          "name": "programs_status_check",
+          "value": "\"programs\".\"status\" IN ('draft', 'published', 'archived')"
+        }
+      }
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text COLLATE NOCASE",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
