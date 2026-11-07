@@ -1,0 +1,19 @@
+{
+  "name": "learner-progress-card",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w learning-progress",
+    "dev:server": "npm run dev -w @learner-progress/server",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start -w @learner-progress/server",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  }
+}
