@@ -25,29 +25,31 @@
 | Testing | Vitest + Playwright | Unit/DB/API tests and end-to-end user flows |
 | Runtime | Node.js | Server process and tooling |
 
-> The `client`, `server`, and `shared` workspaces are scaffolded, and `typecheck`, `lint`,
-> `test`, and `build` pass. Tailwind, the database layer, shared contracts, and Playwright e2e
-> are still being wired up.
+> The dashboard currently displays labeled, precomputed preview data and is not connected to
+> the learner API. Weekly activity, shared contracts, and Playwright e2e are still planned.
+> Dashboard styling uses Tailwind utilities and light and dark color tokens defined in
+> `client/src/index.css`.
 
-## Functions:
+## Planned v1 functions:
 
-1. Show learner's name and program
-2. Show overall progress bar with percentage
-3. Show modules completed out of total
-4. Light and Dark theme
+1. Select an available demo learner
+2. Show learner's name and enrolled program
+3. Show overall progress percentage and modules completed out of total
+4. Show the most recent lesson activity, or "No activity yet"
+5. Light and Dark theme
 
 ## User flow (v1)
 
 ```text
 Open Learning Platform
         ↓
-Open demo learner (no sign-in)
+Select a demo learner (no sign-in)
         ↓
 Open Learning Progress Dashboard
         ↓
 View learner name + enrolled program
         ↓
-View overall progress and modules completed / total
+View progress, modules completed / total, and last activity
         ↓
 Select a module
         ↓
@@ -79,11 +81,18 @@ View results     Complete lessons
 
 ## v1 scope
 
-v1 is a read-only demo: one seeded program with five learners at different progress stages,
-and no sign-in, registration, or password reset. The dashboard opens a fixed demo learner; the
-other seeded learners are fixtures for the different progress states. Progress is seeded, so
-the "Complete lessons" loop in the post-MVP flow is not part of v1. See
+v1 is a planned read-only demo: one seeded program with five learners at different progress
+stages, and no sign-in, registration, or password reset. The dashboard will offer a dropdown
+to select a demo learner. Anyone who can access the demo can view their data; selection is
+not authentication. Progress is seeded, so the "Complete lessons" loop in the post-MVP flow
+is not part of v1. Last activity will be the latest recorded lesson access across the
+selected learner's progress records, or "No activity yet" when none exists. See
 `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
+
+## Future work
+
+- Add weekly activity data for a line or bar chart. Activity events, time zones, and week
+  boundaries will be defined before implementation.
 
 ## Development
 
