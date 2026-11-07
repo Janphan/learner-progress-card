@@ -8,9 +8,7 @@
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=for-the-badge&logo=drizzle&logoColor=black)
-![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
-![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)
 
 ## Screenshots
 
@@ -31,23 +29,23 @@
 | Styling | Tailwind CSS + design tokens | Light/dark theming via CSS custom properties |
 | Server | Express | REST API, health check, graceful shutdown |
 | Database | SQLite + Drizzle ORM | Schema, migrations, and seed data |
-| Contracts | Zod | Request/response validation shared by client and server |
-| Testing | Vitest + Playwright | Unit/DB/API tests and end-to-end user flows |
+| Contracts | Hand-written validators (Zod planned) | Client checks API responses; shared schemas are still to come |
+| Testing | Vitest (Playwright planned) | Unit, database, and API tests; end-to-end flows are still to come |
 | Runtime | Node.js | Server process and tooling |
 
 > The dashboard loads learners and progress from the API. The weekly activity chart,
-> shared contracts, and Playwright e2e are still planned.
-> Dashboard styling uses Tailwind utilities and light and dark color tokens defined in
-> `client/src/index.css`.
+> shared progress/contracts, and Playwright e2e are still planned.
+> Dashboard styling uses Tailwind utilities and light and dark colour tokens defined in
+> `client/src/index.css`; there is no separate token document.
 
-## Planned v1 functions:
+## v1 features
 
-1. Select an available demo learner
-2. Show learner's name and enrolled program
-3. Show overall progress percentage and modules completed out of total
-4. Show the most recent lesson activity, or "No activity yet"
-5. Show a weekly chart of completed lessons (still to implement)
-6. Light and Dark theme
+- [x] Select an available demo learner
+- [x] Show the learner's name and enrolled program
+- [x] Show overall progress percentage and modules completed out of total
+- [x] Show the most recent lesson activity, or "No activity yet"
+- [x] Light and dark theme
+- [ ] Show a weekly chart of completed lessons
 
 ## User flow (v1)
 
@@ -62,9 +60,9 @@ View learner name + enrolled program
         ↓
 View progress, modules completed / total, and last activity
         ↓
-Select a module
+Select a module (planned)
         ↓
-View module details and lesson statuses (read-only)
+View module details and lesson statuses, read-only (planned)
         ↓
 Return to progress dashboard
 ```
@@ -92,47 +90,74 @@ View results     Complete lessons
 
 ## v1 scope
 
-v1 is a planned read-only demo: three seeded programs with five learners at different progress
-stages, and no sign-in, registration, or password reset. The dashboard will offer a dropdown
+v1 is a read-only demo: three seeded programs with five learners at different progress
+stages, and no sign-in, registration, or password reset. The dashboard offers a dropdown
 to select a demo learner. Anyone who can access the demo can view their data; selection is
 not authentication. Progress is seeded, so the "Complete lessons" loop in the post-MVP flow
-is not part of v1. Last activity will be the latest recorded lesson access across the
-selected learner's progress records, or "No activity yet" when none exists. See
-`docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
+is not part of v1. Last activity is the latest recorded lesson access across the selected
+learner's progress records, or "No activity yet" when none exists. See
+`docs/decisions/ADR-0002-no-auth-v1.md` for the no-auth decision.
 
 ## Current status
 
-The read-only demo dashboard is connected to the Express API and SQLite seed data. It supports
-learner selection, displays learner and program details, lesson and module progress, and last
-activity, and includes light/dark themes. The API also returns weekly lesson-completion data,
-but the dashboard chart is not implemented yet.
+The read-only dashboard is connected to the Express API and SQLite seed data. It supports
+learner selection, shows learner and program details, lesson and module progress, and last
+activity, and has light/dark themes with higher-contrast borders. The API also returns weekly
+lesson-completion data, but the dashboard chart is not implemented yet.
 
-The repository has workspace checks and tests for the client, server, shared scaffold, and
-database. The shared workspace does not yet contain the planned shared progress calculation or
-Zod API contracts; progress is currently calculated by the server, and the client validates API
-responses locally.
+`typecheck`, `lint`, `test`, and `build` pass. The test suite covers the database constraints and
+seed, the API routes and progress calculation, and the client's API validators. The `shared/`
+workspace is still a scaffold: it has no progress calculation or Zod contracts yet, so the
+server calculates progress and the client validates responses locally.
+
+There is no CI workflow yet, and end-to-end tests are not configured.
 
 ## Next implementation steps
 
-1. Render the API's weekly completion data as a dashboard chart, including an empty state.
-2. Implement the planned read-only module list and module-detail view, if they remain part of v1.
-3. Move progress calculation and API contracts into `shared/`, then update server and client to
-   use them.
+1. Move progress calculation and API contracts into `shared/`, then update the server and client
+   to use them. A draft `computeProgress()` implementation and tests exist but are not integrated
+   yet.
+2. Render the API's weekly completion data as a dashboard chart, including an empty state.
+3. Implement the read-only module list and module-detail view, if they remain part of v1.
 4. Add Playwright end-to-end coverage for learner selection, loading/error states, and both
    themes.
+5. Add a CI workflow that runs `typecheck`, `lint`, `test`, and `build`.
 
 Authentication and lesson-completion writes remain post-MVP; v1 is a read-only demo.
 
+## Project structure
+
+| Path | Purpose |
+| :--- | :--- |
+| `client/` | React + Vite dashboard |
+| `server/` | Express API |
+| `database/` | Drizzle schema, migrations, seed, and database tests |
+| `shared/` | Shared types, Zod schemas, and progress logic (planned) |
+| `test/` | Playwright end-to-end tests (planned) |
+| `docs/decisions/` | Architecture decision records |
+
 ## Development
 
-The repository is an npm workspace monorepo. The `client`, `server`, and `shared`
-packages are workspaces; run their scripts from the repository root.
+Prerequisites: Node.js (LTS) and npm. The repository is an npm workspace monorepo; the
+`client`, `server`, and `shared` packages are workspaces, and all commands run from the
+repository root.
 
-From the repository root, install dependencies:
+Install dependencies:
 
 ```bash
 npm install
 ```
+
+Create and seed the local SQLite database before starting the server:
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+The seed command creates three demo programs with three modules and nine lessons each, plus
+five learners assigned across the programs at different progress stages: not started, early
+progress, mid-progress, nearly complete, and completed. It is safe to run repeatedly.
 
 Start the Express server:
 
@@ -146,16 +171,15 @@ In a second terminal, start the Vite client:
 npm run dev
 ```
 
-Open the URL printed by Vite. Its development proxy forwards `/api` requests
-to the server on port 3000. The health endpoint is available at
-`http://localhost:3000/api/health`.
+Open the URL printed by Vite. Its development proxy forwards `/api` requests to the server on
+port 3000. The health endpoint is at `http://localhost:3000/api/health`.
 
-The server provides `GET /api/learners` and `GET /api/learners/:id/progress`.
-The latter reports weekly lesson completions grouped by UTC weeks starting on Monday.
-It currently uses the learner's first enrollment when multiple exist. The dashboard
-loads both endpoints through the Vite proxy.
+The server provides `GET /api/learners` and `GET /api/learners/:id/progress`. The latter
+reports weekly lesson completions grouped by UTC weeks starting on Monday, and uses the
+learner's first enrollment when multiple exist. The dashboard loads both endpoints through the
+Vite proxy.
 
-Run the workspace checks from the repository root:
+Run the checks from the repository root:
 
 ```bash
 npm run typecheck
@@ -164,16 +188,10 @@ npm test
 npm run build
 ```
 
-Create or update the local SQLite database from the committed migrations:
-
-```bash
-npm run db:migrate
-npm run db:seed
-```
-
-The seed command creates three demo programs with three modules and nine lessons each, plus
-five learners assigned across the programs at different progress stages: not started, early
-progress, mid-progress, nearly complete, and completed. It is safe to run repeatedly.
+`npm run lint` currently covers the client workspace; lint configuration for `server/` and
+`shared/` is still to come. `npm test` runs the client, server, and shared tests plus the
+database tests, which apply the migrations to an in-memory database and verify the schema
+constraints.
 
 After changing `database/schema.ts`, generate a new migration before applying it:
 
@@ -182,9 +200,7 @@ npm run db:generate
 npm run db:migrate
 ```
 
-Set `DATABASE_PATH` to use a different database file (see `.env.example`). Generated
-migrations in `database/migrations/` are committed; the database file under `database/data/`
-is ignored. `npm test` includes the database tests, which run the migrations against an
-in-memory database and verify the schema constraints.
+Set `DATABASE_PATH` to use a different database file (see `.env.example`). Generated migrations
+in `database/migrations/` are committed; the database file under `database/data/` is ignored.
 
 End-to-end commands will be added once Playwright is configured.
