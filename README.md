@@ -10,7 +10,7 @@
 ## User flow
 Open Learning Platform
         ↓
-Sign in / Resume Session
+Open demo learner (no sign-in in v1)
         ↓
 Open Learning Progress Dashboard
         ↓
@@ -34,3 +34,9 @@ View results      Complete lessons
       Progress updates
               ↓
  Return to Progress Dashboard
+
+## v1 scope
+
+v1 is a read-only demo: one seeded learner and program, with no sign-in, registration, or
+password reset. The "Continue learning" / "Complete lessons" branch above is the target flow,
+not v1. See `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
