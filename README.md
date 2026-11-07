@@ -12,6 +12,16 @@
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)
 
+## Screenshots
+
+### Light theme
+
+![Learner progress dashboard in the light theme](assets/dashboard1.png)
+
+### Dark theme
+
+![Learner progress dashboard in the dark theme](assets/dashboard2.png)
+
 ## Tech Stack
 
 | Layer | Technology | Role |
