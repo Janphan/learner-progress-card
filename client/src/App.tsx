@@ -85,21 +85,24 @@ function App() {
       <main className="mx-auto max-w-[784px] px-[42px] pt-6 pb-[38px] max-[480px]:px-[18px] max-[480px]:py-6">
         <header className="flex items-center justify-between gap-5">
           <div>
-            <p className="mt-0 mr-0 mb-[7px] ml-0 text-[13px] font-[650]">Skillio</p>
+            <p className="mt-0 mr-0 mb-[7px] ml-0 flex items-center gap-2 text-[13px] font-[650] text-dashboard-accent">
+              <span className="size-1.5 rounded-full bg-dashboard-accent" aria-hidden="true" />
+              Skillio
+            </p>
             <h1 className="m-0 text-[30px] leading-[1.15] font-bold tracking-[-1.2px] max-[480px]:text-[26px]">Learner progress</h1>
           </div>
           <button
-            className="grid size-10 cursor-pointer place-items-center rounded-[9px] border border-dashboard-border bg-dashboard-bg text-dashboard-muted focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-dashboard-accent"
+            className="grid size-11 cursor-pointer place-items-center rounded-[10px] border border-dashboard-accent bg-[color-mix(in_srgb,var(--color-accent)_12%,var(--color-surface))] text-dashboard-accent shadow-sm transition-colors hover:bg-[color-mix(in_srgb,var(--color-accent)_20%,var(--color-surface))] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-dashboard-accent"
             type="button"
             aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
             onClick={toggleTheme}
           >
             {theme === 'light' ? (
-              <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+              <svg className="size-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M20.2 15.5A8.2 8.2 0 0 1 8.5 3.8 8.3 8.3 0 1 0 20.2 15.5Z" />
               </svg>
             ) : (
-              <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+              <svg className="size-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="4" />
                 <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
               </svg>
@@ -141,7 +144,8 @@ function App() {
           </div>
         )}
         {learner && (
-        <section className="rounded-xl bg-dashboard-surface p-8 max-[480px]:p-[22px]" aria-label={`${learner.name} progress`}>
+        <section className="relative overflow-hidden rounded-xl border border-dashboard-border bg-dashboard-surface p-8 shadow-lg shadow-black/5 max-[480px]:p-[22px]" aria-label={`${learner.name} progress`}>
+          <span className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-dashboard-accent to-dashboard-success" aria-hidden="true" />
           <div className="flex items-center gap-4 border-b border-dashboard-border pb-6">
             <span className="grid h-[46px] flex-[0_0_46px] place-items-center rounded-full text-[14px] font-bold text-dashboard-accent [background:color-mix(in_srgb,var(--color-accent)_10%,var(--color-surface))]" aria-hidden="true">{initials}</span>
             <div>
@@ -156,7 +160,7 @@ function App() {
                 <h3 className="mt-0 mb-1 text-[14px] font-semibold text-dashboard-muted">Overall progress</h3>
                 <p className="m-0 text-[12px] text-dashboard-muted">{learner.completedLessons} of {learner.totalLessons} lessons completed</p>
               </div>
-              <strong className="text-[30px] tracking-[-1px]">{learner.percent}%</strong>
+              <strong className="text-[30px] tracking-[-1px] text-dashboard-accent">{learner.percent}%</strong>
             </div>
             <div
               className="h-[10px] overflow-hidden rounded-full bg-dashboard-track"
@@ -167,7 +171,7 @@ function App() {
               aria-valuenow={learner.percent}
               aria-valuetext={`${learner.percent}%, ${learner.completedLessons} of ${learner.totalLessons} lessons completed`}
             >
-              <div className="h-full rounded-[inherit] bg-dashboard-accent transition-[width] duration-[180ms] ease-in-out motion-reduce:transition-none" style={{ width: `${learner.percent}%` }} />
+              <div className="h-full rounded-[inherit] bg-linear-to-r from-dashboard-accent to-dashboard-success transition-[width] duration-[180ms] ease-in-out motion-reduce:transition-none" style={{ width: `${learner.percent}%` }} />
             </div>
             {learner.totalLessons === 0 && (
               <p className="mb-0 text-[12px] text-dashboard-muted">This program has no lessons yet.</p>
@@ -180,17 +184,23 @@ function App() {
           <div className="border-b border-dashboard-border py-6">
             <h3 className="mt-0 mb-1 text-[14px] font-semibold">Lessons completed</h3>
             <p className="m-0 text-[12px] text-dashboard-muted">Weekly activity chart coming later</p>
-            <div className="mt-4 grid min-h-[130px] place-items-center rounded-lg border border-dashed border-dashboard-border text-center text-[13px] text-dashboard-muted">Weekly activity chart is not implemented yet.</div>
+            <div className="mt-4 grid min-h-[130px] place-items-center rounded-lg border border-dashed border-dashboard-border bg-dashboard-bg text-center text-[13px] text-dashboard-muted">Weekly activity chart is not implemented yet.</div>
           </div>
 
-          <div className="grid grid-cols-2 pt-6 max-[480px]:gap-3">
-            <div>
-              <p className="m-0 text-[12px] text-dashboard-muted">Modules completed</p>
-              <strong className="mt-2 block text-[16px]">{learner.completedModules} of {learner.totalModules}</strong>
+          <div className="grid grid-cols-2 gap-3 pt-6 max-[480px]:grid-cols-1">
+            <div className="rounded-lg border border-dashboard-border bg-dashboard-bg p-4">
+              <p className="m-0 flex items-center gap-2 text-[12px] font-semibold text-dashboard-muted">
+                <span className="size-1.5 rounded-full bg-dashboard-success" aria-hidden="true" />
+                Modules completed
+              </p>
+              <strong className="mt-2 block text-[18px]">{learner.completedModules} of {learner.totalModules}</strong>
             </div>
-            <div className="border-l border-dashboard-border pl-4">
-              <p className="m-0 text-[12px] text-dashboard-muted">Last activity</p>
-              <strong className="mt-2 block text-[16px]">{formatActivity(learner.lastActivityAt)}</strong>
+            <div className="rounded-lg border border-dashboard-border bg-dashboard-bg p-4">
+              <p className="m-0 flex items-center gap-2 text-[12px] font-semibold text-dashboard-muted">
+                <span className="size-1.5 rounded-full bg-dashboard-accent" aria-hidden="true" />
+                Last activity
+              </p>
+              <strong className="mt-2 block text-[18px]">{formatActivity(learner.lastActivityAt)}</strong>
             </div>
           </div>
         </section>
