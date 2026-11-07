@@ -13,9 +13,9 @@ email matching, enrollment consistency, theme storage, and the SQLite driver. Th
 affect every table, the API contract, seed data, and migrations, so they need to be settled
 before the first schema is written.
 
-This is an MVP for a demo: one seeded learner, one enrolled program, SQLite, Drizzle, and
-TypeScript. The goal is a schema that is small, strictly typed, and enforced by the database
-rather than only by application code.
+This is an MVP for a demo: one seeded program with five learners at different progress stages,
+SQLite, Drizzle, and TypeScript. The goal is a schema that is small, strictly typed, and
+enforced by the database rather than only by application code.
 
 ## Decision
 

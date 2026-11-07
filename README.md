@@ -79,9 +79,11 @@ View results     Complete lessons
 
 ## v1 scope
 
-v1 is a read-only demo: one seeded learner and program, with no sign-in, registration, or
-password reset. Progress is seeded, so the "Complete lessons" loop in the post-MVP flow is not
-part of v1. See `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
+v1 is a read-only demo: one seeded program with five learners at different progress stages,
+and no sign-in, registration, or password reset. The dashboard opens a fixed demo learner; the
+other seeded learners are fixtures for the different progress states. Progress is seeded, so
+the "Complete lessons" loop in the post-MVP flow is not part of v1. See
+`docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the build plan.
 
 ## Development
 
@@ -123,7 +125,12 @@ Create or update the local SQLite database from the committed migrations:
 
 ```bash
 npm run db:migrate
+npm run db:seed
 ```
+
+The seed command creates one demo program with three modules and nine lessons, plus five
+learners at different stages: not started, early progress, mid-progress, nearly complete,
+and completed. It is safe to run repeatedly.
 
 After changing `database/schema.ts`, generate a new migration before applying it:
 

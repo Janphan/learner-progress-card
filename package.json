@@ -17,7 +17,8 @@
     "test": "npm run test --workspaces --if-present && npm run test:db",
     "test:db": "vitest run database",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx database/migrate.ts"
+    "db:migrate": "tsx database/migrate.ts",
+    "db:seed": "tsx database/seed-run.ts"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
