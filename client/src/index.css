@@ -2,6 +2,20 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+/*
+ * Design tokens: the single source of truth for colour.
+ * `@theme inline` maps these to Tailwind utilities (bg-dashboard-*,
+ * border-dashboard-*, text-dashboard-*, ...), so components never hard-code hex values.
+ *
+ * --color-bg      page background
+ * --color-surface card background
+ * --color-text    main text
+ * --color-muted   secondary text and labels
+ * --color-accent  progress fill, focus ring, links
+ * --color-track   progress bar background and chart grid
+ * --color-border  card, input, and divider outlines
+ * --color-success completed state
+ */
 @theme inline {
   --color-dashboard-bg: var(--color-bg);
   --color-dashboard-surface: var(--color-surface);
