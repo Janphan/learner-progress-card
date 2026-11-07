@@ -1,26 +1,19 @@
 {
-  "name": "@learner-progress/server",
+  "name": "learner-progress-card",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "dev:server": "tsx watch server/index.ts",
-    "build": "tsc --rootDir .",
-    "start": "node dist/server/index.js",
-    "test": "vitest run"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.6.6",
-    "tsx": "^4.23.15",
-    "typescript": "^7.0.2",
-    "vitest": "^5.1.0"
-  },
-  "dependencies": {
-    "express": "^5.3.0"
-  },
   "workspaces": [
     "client",
     "server",
     "shared"
-  ]
+  ],
+  "scripts": {
+    "dev": "npm run dev -w learning-progress",
+    "dev:server": "npm run dev -w @learner-progress/server",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start -w @learner-progress/server",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  }
 }

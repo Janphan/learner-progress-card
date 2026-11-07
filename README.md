@@ -71,6 +71,9 @@ not v1. See `docs/decisions/ADR-0002-no-auth-v1.md` and `local.plan.md` for the 
 
 ## Development
 
+The repository is an npm workspace monorepo. The `client`, `server`, and `shared`
+packages are workspaces; run their scripts from the repository root.
+
 From the repository root, install dependencies:
 
 ```bash
