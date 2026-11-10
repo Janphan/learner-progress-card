@@ -74,7 +74,7 @@ attached to the final PR (#6) as the representative submission.
 
 | Light theme | Dark theme |
 | :--- | :--- |
-| ![Learner progress dashboard in the light theme](assets/dashboard1.png) | ![Learner progress dashboard in the dark theme](assets/dashboard2.png) |
+| ![Learner progress dashboard in the light theme](https://raw.githubusercontent.com/Janphan/learner-progress-card/main/assets/dashboard1.png) | ![Learner progress dashboard in the dark theme](https://raw.githubusercontent.com/Janphan/learner-progress-card/main/assets/dashboard2.png) |
 
 ## AI notes
 
