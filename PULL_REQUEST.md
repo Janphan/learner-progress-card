@@ -78,9 +78,10 @@ attached to the final PR (#6) as the representative submission.
 
 ## AI notes
 
-- **Tools used:** <!-- TODO -->
-- **Used for:** <!-- TODO -->
-- **Got wrong, noticed, and fixed:** <!-- TODO -->
+- **Tools used:** GitHub Copilot, Gemini
+- **Used for:** Documentation and research on the ERD (entity relationships and data model
+  conventions).
+- **Got wrong, noticed, and fixed:** Nothing noticed yet in this change.
 
 ## Known limitations and next steps
 
