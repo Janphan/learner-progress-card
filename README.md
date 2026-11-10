@@ -110,7 +110,8 @@ seed, the API routes and progress calculation, and the client's API validators. 
 workspace is still a scaffold: it has no progress calculation or Zod contracts yet, so the
 server calculates progress and the client validates responses locally.
 
-There is no CI workflow yet, and end-to-end tests are not configured.
+A GitHub Actions workflow runs `typecheck`, `lint`, `test`, and `build` on pushes to `main` and
+on pull requests. There is no end-to-end test configuration yet.
 
 ## Next implementation steps
 
@@ -121,7 +122,6 @@ There is no CI workflow yet, and end-to-end tests are not configured.
 3. Implement the read-only module list and module-detail view, if they remain part of v1.
 4. Add Playwright end-to-end coverage for learner selection, loading/error states, and both
    themes.
-5. Add a CI workflow that runs `typecheck`, `lint`, `test`, and `build`.
 
 Authentication and lesson-completion writes remain post-MVP; v1 is a read-only demo.
 
