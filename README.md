@@ -136,6 +136,86 @@ Authentication and lesson-completion writes remain post-MVP; v1 is a read-only d
 | `test/` | Playwright end-to-end tests (planned) |
 | `docs/decisions/` | Architecture decision records |
 
+## Data model
+
+Six tables, with `lesson_progress` as the fact table joining *who* (enrollment) to *what* (lesson):
+
+```mermaid
+erDiagram
+    users ||--o{ enrollments : "enrolls in"
+    programs ||--o{ enrollments : "has"
+    programs ||--o{ modules : "contains"
+    modules ||--o{ lessons : "contains"
+    enrollments ||--o{ lesson_progress : "tracks"
+    lessons ||--o{ lesson_progress : "recorded in"
+
+    programs {
+        integer id PK "autoincrement"
+        text title "NOT NULL"
+        text description "nullable"
+        text status "draft, published, archived"
+        text created_at "NOT NULL"
+        text updated_at "NOT NULL"
+    }
+    modules {
+        integer id PK "autoincrement"
+        integer program_id FK
+        text title "NOT NULL"
+        text description "nullable"
+        integer position "unique per program, positive"
+        text created_at "NOT NULL"
+        text updated_at "NOT NULL"
+    }
+    lessons {
+        integer id PK "autoincrement"
+        integer module_id FK
+        integer program_id FK
+        text title "NOT NULL"
+        text content_type "video, article, quiz"
+        integer position "unique per module, positive"
+        integer duration_minutes "non-negative; 0 means no fixed duration"
+        text created_at "NOT NULL"
+        text updated_at "NOT NULL"
+    }
+    users {
+        integer id PK "autoincrement"
+        text name "NOT NULL"
+        text email "UNIQUE, case-insensitive"
+        text created_at "NOT NULL"
+        text updated_at "NOT NULL"
+    }
+    enrollments {
+        integer id PK "autoincrement"
+        integer user_id FK
+        integer program_id FK
+        text enrolled_at "NOT NULL"
+        text started_at "nullable"
+        text completed_at "nullable"
+        text status "enrolled, active, completed, withdrawn"
+    }
+    lesson_progress {
+        integer id PK "autoincrement"
+        integer enrollment_id FK
+        integer lesson_id FK
+        integer program_id FK
+        text status "not_started, in_progress, completed"
+        integer progress_percent "0-100, agrees with status"
+        text started_at "nullable"
+        text completed_at "nullable"
+        text last_accessed_at "nullable"
+    }
+```
+
+A user enrolls in a program (via `enrollments`), and each lesson they take gets one
+`lesson_progress` row tied to that enrollment. Overall progress is derived from those rows:
+only `status = 'completed'` lessons count.
+
+The diagram omits two details enforced in the schema: several foreign keys are composite —
+`lesson_progress` references `(enrollment_id, program_id)` and `(lesson_id, program_id)` so
+progress can never be recorded against a lesson outside the enrolled program — and deleting
+a lesson cascades to its progress rows. See `docs/decisions/ADR-0001-data-model.md` for the
+model's conventions and `database/schema.ts` for the authoritative schema.
+
 ## Development
 
 Prerequisites: Node.js (LTS) and npm. The repository is an npm workspace monorepo; the
