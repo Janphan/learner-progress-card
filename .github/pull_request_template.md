@@ -8,22 +8,53 @@ Keep each commit buildable and testable.
 
 ## Summary
 
-<!-- What changed and why, in 2-4 bullets. Link the related ADR or issue. -->
+<!-- What this change does and why, in a few sentences. Link the related ADR or issue. -->
 
--
+## What changed
+
+<!-- The main parts of the change, and any decisions or trade-offs you made. -->
+
+- **Database:**
+- **API:**
+- **Frontend:**
+
+## How to test
+
+<!-- Steps a reviewer can follow to run and check the change. -->
+
+1.
+2.
+
+Then confirm the checks pass:
+
+- [ ] `npm run typecheck`
+- [ ] `npm run lint`
+- [ ] `npm test`
+- [ ] `npm run build`
+
+## Screenshots
+
+<!-- For UI changes, include the card in the light and dark themes. Remove this section if not applicable. -->
+
+| Light theme | Dark theme |
+| :--- | :--- |
+| | |
+
+## AI notes
+
+<!-- Which AI tools you used, what for, and at least one thing they got wrong and how you noticed and fixed it. -->
+
+- **Tools used:**
+- **Used for:**
+- **Got wrong, noticed, and fixed:**
+
+## Known limitations and next steps
+
+<!-- What you left out or would improve with more time. -->
 
 ## Related
 
 <!-- Closes #123, or the ADR this implements. -->
-
-## Testing
-
-<!-- What you ran and what you verified. -->
-
-- [ ] `typecheck` passes
-- [ ] `lint` passes
-- [ ] `test` passes
-- [ ] `build` passes
 
 ## Checklist
 
@@ -35,11 +66,3 @@ Keep each commit buildable and testable.
 - [ ] New dependency is explained above
 - [ ] API request/response types and validation live in `shared/`
 - [ ] No secrets, `.env` files, `node_modules`, or database files committed
-
-## Screenshots / recordings
-
-<!-- For UI changes, include light and dark theme. Remove this section if not applicable. -->
-
-## Follow-ups
-
-<!-- Known gaps intentionally left for later. -->
