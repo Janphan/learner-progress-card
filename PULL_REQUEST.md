@@ -89,8 +89,9 @@ attached to the final PR (#6) as the representative submission.
   tracked by ADR-0003.
 - The API returns weekly completion data, but the dashboard chart is not rendered yet.
 - The read-only module list and module-detail view are not implemented.
-- There is no Playwright end-to-end coverage and no CI workflow; `lint` currently covers only
-  the client workspace.
+- There is no Playwright end-to-end coverage yet; `lint` currently covers only the client
+  workspace. CI runs the `typecheck`, `lint`, `test`, and `build` checks on every push and
+  pull request.
 - Authentication and lesson-completion writes are post-MVP; v1 is intentionally read-only.
 
 ## Related
